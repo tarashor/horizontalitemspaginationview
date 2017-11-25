@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         final HorizontalItemsPaginationView horizontalItemsPaginationView = findViewById(R.id.items_view);
         horizontalItemsPaginationView.setVisibility(View.GONE);
+        horizontalItemsPaginationView.setRightPadding(20);
 
         testAdapter = new ItemsAdapter();
         testAdapter.setDataLoader(new PaginationWithLoadingItemAdapter.DataLoader() {
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 horizontalItemsPaginationView.setVisibility(View.GONE);
                 items.clear();
-                testAdapter.setItems(null, 0);
+                testAdapter.setItems(items, 0);
+
             }
         });
 
