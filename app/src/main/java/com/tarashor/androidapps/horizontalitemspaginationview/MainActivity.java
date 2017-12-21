@@ -29,14 +29,16 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
 
     private ItemsAdapter testAdapter;
+    private boolean isCleared = false;
+    private HorizontalItemsPaginationView horizontalItemsPaginationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final HorizontalItemsPaginationView horizontalItemsPaginationView = findViewById(R.id.items_view);
-        horizontalItemsPaginationView.setVisibility(View.GONE);
+        horizontalItemsPaginationView = findViewById(R.id.items_view);
+        //horizontalItemsPaginationView.setVisibility(View.GONE);
         horizontalItemsPaginationView.setRightPadding(20);
 
         testAdapter = new ItemsAdapter();
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isCleared = false;
                 horizontalItemsPaginationView.setVisibility(View.VISIBLE);
                 testAdapter.setItems(null, -1);
             }
@@ -61,10 +64,9 @@ public class MainActivity extends AppCompatActivity {
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                horizontalItemsPaginationView.setVisibility(View.GONE);
-                items.clear();
-                testAdapter.setItems(items, 0);
-
+                isCleared = true;
+                horizontalItemsPaginationView.setVisibility(View.VISIBLE);
+                testAdapter.setItems(null, -1);
             }
         });
 
@@ -72,10 +74,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadNextPage() {
         handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                items.addAll(generateItems(PAGE_COUNT));
-                testAdapter.setItems(items, TOTAL_COUNT);
+                @Override
+                public void run() {
+                    if (isCleared){
+                        items.clear();
+                        testAdapter.setItems(items, 0);
+                        horizontalItemsPaginationView.setVisibility(View.GONE);
+                    } else {
+                        items.addAll(generateItems(PAGE_COUNT));
+                        testAdapter.setItems(items, TOTAL_COUNT);
+                        horizontalItemsPaginationView.setVisibility(View.VISIBLE);
+                    }
+
             }
         }, DELAY_MILLIS);
     }
