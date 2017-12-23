@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -13,17 +14,15 @@ import android.widget.TextView;
 
 import com.tarashor.androidapps.widgets.HorizontalItemsPaginationView;
 import com.tarashor.androidapps.widgets.PaginationAdapter;
-import com.tarashor.androidapps.widgets.PaginationWithLoadingItemAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int TOTAL_COUNT = 100;
-    public static final int PAGE_COUNT = 10;
+    public static final int TOTAL_COUNT = 1;
+    public static final int PAGE_COUNT = 1;
     public static final int DELAY_MILLIS = 1500;
     private List<Item> items = new ArrayList<>();
     private Handler handler = new Handler();
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ItemsAdapter testAdapter;
     private boolean isCleared = false;
     private HorizontalItemsPaginationView horizontalItemsPaginationView;
+    private SwitchCompat clearSwitchCompat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         horizontalItemsPaginationView.setRightPadding(20);
 
         testAdapter = new ItemsAdapter();
-        testAdapter.setDataLoader(new PaginationWithLoadingItemAdapter.DataLoader() {
+        testAdapter.setDataLoader(new PaginationAdapter.DataLoader() {
             @Override
             public void loadMoreData(int itemsCountLoaded, final PaginationAdapter adapter) {
                 loadNextPage();
@@ -51,38 +51,37 @@ public class MainActivity extends AppCompatActivity {
         horizontalItemsPaginationView.setAdapter(testAdapter);
 
         Button startButton = findViewById(R.id.button_start_loading);
-        Button clearButton = findViewById(R.id.button_clear);
+        clearSwitchCompat = findViewById(R.id.clear_switch);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isCleared = false;
-                horizontalItemsPaginationView.setVisibility(View.VISIBLE);
-                testAdapter.setItems(null, -1);
+                startLoadingData();
             }
         });
 
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isCleared = true;
-                horizontalItemsPaginationView.setVisibility(View.VISIBLE);
-                testAdapter.setItems(null, -1);
-            }
-        });
+        startLoadingData();
 
+    }
+
+    private void startLoadingData() {
+        horizontalItemsPaginationView.setVisibility(View.VISIBLE);
+        testAdapter.setIsAllDataLoaded(false);
+        testAdapter.loadMoreData();
     }
 
     private void loadNextPage() {
         handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (isCleared){
+                    if (clearSwitchCompat.isChecked()){
                         items.clear();
-                        testAdapter.setItems(items, 0);
+                        testAdapter.setItems(items);
+                        testAdapter.setIsAllDataLoaded(true);
                         horizontalItemsPaginationView.setVisibility(View.GONE);
                     } else {
                         items.addAll(generateItems(PAGE_COUNT));
-                        testAdapter.setItems(items, TOTAL_COUNT);
+                        testAdapter.setItems(items);
+                        testAdapter.setIsAllDataLoaded(items.size() == TOTAL_COUNT);
                         horizontalItemsPaginationView.setVisibility(View.VISIBLE);
                     }
 
@@ -140,45 +139,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class ItemsAdapter extends PaginationWithLoadingItemAdapter{
-
-        private int totalCount = -1;
-        List<Item> items = new ArrayList<>();
-
-        @Override
-        protected int getRealItemsCount() {
-            return items.size();
-        }
-
-        public void setItems(List<Item> items, int totalCount) {
-            removeLoadingItem();
-            isDataLoading = false;
-
-            this.items.clear();
-            if (items != null){
-                this.items.addAll(items);
-            }
-            notifyDataSetChanged();
-
-            this.totalCount = totalCount;
-            checkIsAllDataLoaded();
-
-            if (!isAllDataLoaded) {
-                addLoadingItem();
-            }
-        }
-
-        private void checkIsAllDataLoaded() {
-            if (totalCount < 0){
-                isAllDataLoaded = false;
-            } else {
-                isAllDataLoaded = getRealItemsCount() == totalCount;
-            }
-        }
+    public static class ItemsAdapter extends PaginationAdapter<Item>{
 
         @Override
         protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent) {
-            View view = PaginationWithLoadingItemAdapter.createViewFromLayout(parent, R.layout.item_layout);
+            View view = PaginationAdapter.createViewFromLayout(parent, R.layout.item_layout);
             return new ItemViewHolder(view);
         }
 
@@ -190,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected LoadingViewHolder createLoadingViewHolder(ViewGroup parent) {
-            View view = PaginationWithLoadingItemAdapter.createViewFromLayout(parent, R.layout.loading_item_layout);
+            View view = PaginationAdapter.createViewFromLayout(parent, R.layout.loading_item_layout);
             return new LoadingViewHolder(view);
         }
     }

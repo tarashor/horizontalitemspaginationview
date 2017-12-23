@@ -98,7 +98,7 @@ public class HorizontalItemsPaginationView extends LinearLayout {
         }
     }
 
-    public <VH extends RecyclerView.ViewHolder> void setAdapter(PaginationAdapter<VH> adapter) {
+    public <TItem> void setAdapter(PaginationAdapter<TItem> adapter) {
         this.mAdapter = adapter;
         mRecyclerView.setAdapter(adapter);
     }
