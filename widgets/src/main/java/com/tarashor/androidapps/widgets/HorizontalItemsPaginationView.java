@@ -18,9 +18,8 @@ public class HorizontalItemsPaginationView extends LinearLayout {
     protected static final int LAYOUT_ID = R.layout.horizontal_items_pagination_view;
 
     protected LinearLayoutManager mLayoutManager;
-    protected RecyclerView mRecyclerView;
+    protected PaginationRecyclerView mRecyclerView;
     private int mRightPadding;
-    private PaginationAdapter mAdapter;
 
     public HorizontalItemsPaginationView(Context context) {
         super(context);
@@ -62,29 +61,6 @@ public class HorizontalItemsPaginationView extends LinearLayout {
                                                }
                                            }
                                        });
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkLastItemVisible();
-            }
-        });
-    }
-
-    private void checkLastItemVisible() {
-        int visibleItemCount = mLayoutManager.getChildCount();
-        int totalItemCount = mLayoutManager.getItemCount();
-        int firstVisibleItemPosition = mLayoutManager.findFirstVisibleItemPosition();
-
-        if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
-            mAdapter.loadMoreData();
-        }
     }
 
     protected void initInstances() {
@@ -98,8 +74,7 @@ public class HorizontalItemsPaginationView extends LinearLayout {
         }
     }
 
-    public <VH extends RecyclerView.ViewHolder> void setAdapter(PaginationAdapter<VH> adapter) {
-        this.mAdapter = adapter;
+    public <TItem> void setAdapter(PaginationAdapter<TItem> adapter) {
         mRecyclerView.setAdapter(adapter);
     }
 
