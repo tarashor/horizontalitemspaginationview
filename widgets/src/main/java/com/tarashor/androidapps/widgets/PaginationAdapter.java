@@ -15,13 +15,13 @@ import java.util.List;
  */
 
 public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    public static final int ITEM = 0;
-    public static final int LOADING_ITEM = 1;
+    protected static final int ITEM = 0;
+    protected static final int LOADING_ITEM = 1;
 
     protected DataLoader dataLoader;
 
     protected boolean isDataLoading;
-    protected boolean isAllDataLoaded;
+    protected boolean isDataLoaded;
 
     protected List<TItem> items;
 
@@ -30,9 +30,9 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
         initState();
     }
 
-    private void initState() {
+    protected void initState() {
         isDataLoading = false;
-        isAllDataLoaded = true;
+        isDataLoaded = true;
     }
 
     public void clearAllItems() {
@@ -42,7 +42,7 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
     }
 
     public void loadMoreData() {
-        if (!isDataLoading && !isAllDataLoaded) {
+        if (!isDataLoading && !isDataLoaded) {
             if (dataLoader != null) {
                 isDataLoading = true;
                 dataLoader.loadMoreData(items.size(), this);
@@ -60,10 +60,10 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
         notifyDataSetChanged();
     }
 
-    public void setIsAllDataLoaded(boolean isAllDataLoaded) {
-        if (this.isAllDataLoaded != isAllDataLoaded) {
-            this.isAllDataLoaded = isAllDataLoaded;
-            if (!this.isAllDataLoaded) {
+    public void setIsDataLoaded(boolean isAllDataLoaded) {
+        if (this.isDataLoaded != isAllDataLoaded) {
+            this.isDataLoaded = isAllDataLoaded;
+            if (!this.isDataLoaded) {
                 notifyItemInserted(getItemCount() - 1);
             } else{
                 notifyItemRemoved(getItemCount() - 1);
@@ -80,12 +80,12 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
     @Override
     public int getItemCount() {
         int booksCount = items.size();
-        return isAllDataLoaded ? booksCount : booksCount + 1;
+        return isDataLoaded ? booksCount : booksCount + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return (position == getItemCount() - 1 && !isAllDataLoaded) ? LOADING_ITEM : ITEM;
+        return (position == getItemCount() - 1 && !isDataLoaded) ? LOADING_ITEM : ITEM;
     }
 
 
@@ -128,6 +128,10 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
 
     public static View createViewFromLayout(ViewGroup parent, @LayoutRes int layoutId){
         return LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
+    }
+
+    public boolean isDataLoaded() {
+        return isDataLoaded;
     }
 
 

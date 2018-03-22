@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/HorizontalItemsPaginationView.iml" filepath="$PROJECT_DIR$/HorizontalItemsPaginationView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/horizontalitemspaginationview.iml" filepath="$PROJECT_DIR$/horizontalitemspaginationview.iml" />
       <module fileurl="file://$PROJECT_DIR$/widgets/widgets.iml" filepath="$PROJECT_DIR$/widgets/widgets.iml" />
     </modules>
   </component>
