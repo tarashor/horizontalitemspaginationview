@@ -18,9 +18,15 @@ import com.tarashor.androidapps.widgets.behavior.FooterBarLayoutBehavior;
 public class FooterBarLayout extends FrameLayout {
     public FooterBarLayout(@NonNull Context context) {
         super(context);
+        init();
+    }
+
+    private void init() {
+        setTop(0);
     }
 
     public FooterBarLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 }
