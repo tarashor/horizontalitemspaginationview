@@ -64,9 +64,9 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
         if (this.isDataLoaded != isAllDataLoaded) {
             this.isDataLoaded = isAllDataLoaded;
             if (!this.isDataLoaded) {
-                notifyItemInserted(getItemCount() - 1);
+                notifyItemInserted(getLoadingItemPosition());
             } else{
-                notifyItemRemoved(getItemCount() - 1);
+                notifyItemRemoved(getLoadingItemPosition());
             }
         }
 
@@ -76,6 +76,9 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
         this.dataLoader = dataLoader;
     }
 
+    protected int getLoadingItemPosition() {
+        return getItemCount() - 1;
+    }
 
     @Override
     public int getItemCount() {
@@ -85,9 +88,8 @@ public abstract class PaginationAdapter<TItem> extends RecyclerView.Adapter<Recy
 
     @Override
     public int getItemViewType(int position) {
-        return (position == getItemCount() - 1 && !isDataLoaded) ? LOADING_ITEM : ITEM;
+        return (position == getLoadingItemPosition() && !isDataLoaded) ? LOADING_ITEM : ITEM;
     }
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

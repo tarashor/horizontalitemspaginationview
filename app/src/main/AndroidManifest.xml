@@ -24,6 +24,10 @@
         <activity android:name=".BehaviorItemsActivity"
             android:theme="@style/AppTheme.CustomActionBar">
         </activity>
+
+        <activity android:name=".FooterItemsActivity"
+                  android:theme="@style/AppTheme.CustomActionBar">
+        </activity>
     </application>
 
 </manifest>

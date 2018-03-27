@@ -40,12 +40,33 @@ public class FooterBarLayoutBehavior extends CoordinatorLayout.Behavior<FooterBa
         super(context, attrs);
     }
 
+//    @Override
+//    public boolean onLayoutChild(CoordinatorLayout parent, FooterBarLayout child, int layoutDirection) {
+//        //child.setTop(parent.getHeight());
+//        return true;
+//    }
 
     @Override
     public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FooterBarLayout child,
                                        @NonNull View directTargetChild, @NonNull View target,
                                        int axes, int type) {
-        return (axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
+        if ((axes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0){
+            int extent = ((RecyclerView)target).computeVerticalScrollExtent();
+            int offset = ((RecyclerView)target).computeVerticalScrollOffset();
+            int range = ((RecyclerView)target).computeVerticalScrollRange();
+
+            Log.v(TAG, "offset = " + offset);
+            Log.v(TAG, "extent = " + extent);
+            Log.v(TAG, "range = " + range);
+
+            int footerHeight = child.getMeasuredHeight();
+            if ((extent + offset <= range + footerHeight) && (extent + offset >= range)){
+                return true;
+            }
+
+        }
+
+        return false;
     }
 
     @Override
@@ -54,22 +75,18 @@ public class FooterBarLayoutBehavior extends CoordinatorLayout.Behavior<FooterBa
                                   int dx, int dy,
                                   @NonNull int[] consumed, int type) {
 
-        int extent = ((RecyclerView)target).computeVerticalScrollExtent();
-        int offset = ((RecyclerView)target).computeVerticalScrollOffset();
-        int range = ((RecyclerView)target).computeVerticalScrollRange();
-        if (dy > 0 && extent + offset == range){
-            consumed[1] = dy;
-        }
+        mMaxTop = coordinatorLayout.getHeight() - child.getMeasuredHeight();
+        mMinTop = coordinatorLayout.getHeight();
+
+//        if (dy > 0 && extent + offset + footerHeight == range){
+//
+//        }
 
 //        if (dy < 0 && child.getHeight() <= 0){
 //            consumed[1] = dy;
 //        }
 
-        mMaxTop = coordinatorLayout.getHeight() - child.getMeasuredHeight();
-        mMinTop = coordinatorLayout.getHeight();
 
-        //Log.v(TAG, "mMinTop = " + mMinTop);
-        //Log.v(TAG, "mMaxTop = " + mMaxTop);
     }
 
     @Override
@@ -81,9 +98,6 @@ public class FooterBarLayoutBehavior extends CoordinatorLayout.Behavior<FooterBa
         //Consumed distance is the actual distance traveled by the scrolling view
 
         int newTop = child.getTop() - dyConsumed;
-        Log.v(TAG, "newTop = " + newTop);
-
-        Log.v(TAG, "dxUnconsumed = " + dxUnconsumed);
         if (newTop >= mMaxTop && newTop <= mMinTop){
             child.setTop(newTop);
         }

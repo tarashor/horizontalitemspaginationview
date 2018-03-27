@@ -22,7 +22,6 @@ public class FooterBarLayout extends FrameLayout {
     }
 
     private void init() {
-        setTop(0);
     }
 
     public FooterBarLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
