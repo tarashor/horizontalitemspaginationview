@@ -95,7 +95,7 @@ public abstract class SectionsWithPaginationAndFooterAdapter<TItem> extends Pagi
             case NEW_SECTION_ITEM:
                 bindNewSectionViewHolder(viewHolder);
             default:
-                super.onBindViewHolder(viewHolder, itemPosition);
+                super.onBindViewHolder(viewHolder, position);
                 break;
         }
     }
