@@ -4,14 +4,17 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.tarashor.androidapps.widgets.PaginationAdapter;
 import com.tarashor.androidapps.widgets.PaginationRecyclerView;
 import com.tarashor.androidapps.widgets.PaginationWithFooterAdapter;
+import com.tarashor.androidapps.widgets.SectionsWithPaginationAndFooterAdapter;
 
 public class FooterItemsActivity extends AppCompatActivity {
 
@@ -48,14 +51,44 @@ public class FooterItemsActivity extends AppCompatActivity {
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (adapter.isFooterShown() && adapter.getFooterItemPosition() == position){
-                    return COLUMNS;
+                if ((adapter.isFooterShown() && adapter.getFooterItemPosition() == position) || (adapter.isNewSectionPosition(position))){
+                    return layoutManager.getSpanCount();
                 } else {
                     return 1;
                 }
             }
+
+//            @Override
+//            public int getSpanIndex(int position, int spanCount) {
+//                Log.v("SpanSizeLookup", "pos = " + position);
+//                return position % (spanCount - 1);
+//            }
+
+//            @Override
+//            public int getSpanGroupIndex(int adapterPosition, int spanCount) {
+//                int itemPosition = adapterPosition;
+//
+//                if (adapterPosition > indexToStartNewGroup && adapterPosition != adapter.getItemCount()){
+//                    int emptySpans = spanCount - ((indexToStartNewGroup+1) % spanCount);
+//                    itemPosition = adapterPosition + emptySpans;
+//                }
+//
+//                return super.getSpanGroupIndex(itemPosition, spanCount);
+//
+//            }
         });
 
+    }
+
+    int indexToStartNewGroup = 4;
+
+    private void changeSpanCount() {
+        adapter.startNewSectionAtPos(indexToStartNewGroup);
+//        if (layoutManager.getSpanCount() == COLUMNS) {
+//            layoutManager.setSpanCount(COLUMNS + 1);
+//        } else {
+//            layoutManager.setSpanCount(COLUMNS);
+//        }
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder
@@ -75,18 +108,12 @@ public class FooterItemsActivity extends AppCompatActivity {
         }
     }
 
-    public static class ItemsAdapter extends PaginationWithFooterAdapter<Item> {
+    public class ItemsAdapter extends SectionsWithPaginationAndFooterAdapter<Item> {
 
         @Override
         protected RecyclerView.ViewHolder createItemViewHolder(ViewGroup parent) {
             View view = PaginationAdapter.createViewFromLayout(parent, R.layout.item_layout);
             return new ItemViewHolder(view);
-        }
-
-        @Override
-        protected void bindItemViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-            ItemViewHolder itemViewHolder = (ItemViewHolder) viewHolder;
-            itemViewHolder.bind(items.get(position));
         }
 
         @Override
@@ -98,7 +125,25 @@ public class FooterItemsActivity extends AppCompatActivity {
         @Override
         protected FooterViewHolder createFooterViewHolder(ViewGroup parent) {
             View view = PaginationAdapter.createViewFromLayout(parent, R.layout.footer_item_layout);
+            Button button = view.findViewById(R.id.change_spans_btn);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    changeSpanCount();
+                }
+            });
             return new FooterViewHolder(view);
+        }
+
+        @Override
+        protected RecyclerView.ViewHolder createNewSectionViewHolder(ViewGroup parent) {
+            return new RecyclerView.ViewHolder(new View(FooterItemsActivity.this)){};
+        }
+
+        @Override
+        protected void bindItemViewHolderWithItemPosition(RecyclerView.ViewHolder viewHolder, int itemPosition) {
+            ItemViewHolder itemViewHolder = (ItemViewHolder) viewHolder;
+            itemViewHolder.bind(items.get(itemPosition));
         }
     }
 }
